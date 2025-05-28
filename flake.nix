@@ -2,14 +2,20 @@
   description = "A very basic flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+      nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin"; 
+      home-manager.url = "github:nix-community/home-manager/release-25.05"; 
+      home-manager.inputs.nixpkgs.follows = "nixpkgs";
+      darwin.url = "github:lnl7/nix-darwin";
+      darwin.inputs.nixpkgs.follows = "nixpkgs"; 
   };
 
-  outputs = { self, nixpkgs }: {
+  outputs = { self, nixpkgs, home-manager, darwin }: {
 
-    packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
-
-    packages.x86_64-linux.default = self.packages.x86_64-linux.hello;
-
+    darwinConfigurations."Mike's Mac" = darwin.lib.darwinSystem {
+      system = "x86_64-darwin"; 
+      modules = [
+        home-manager.darwinModules.home-manager
+        ./hosts/YourHostName/default.nix
+      ];
   };
 }
